@@ -1,0 +1,36 @@
+# ── Secrets / environment ────────────────────────────────────────────────
+# Never commit real .env files (templates like .env.example are fine)
+.env
+.env.local
+.env.*.local
+**/.env
+!**/.env.example
+
+# ── Build output ─────────────────────────────────────────────────────────
+target/
+**/target/
+dist/
+dist-ssr/
+build/
+
+# ── Dependencies ─────────────────────────────────────────────────────────
+node_modules/
+**/node_modules/
+
+# ── Local database ───────────────────────────────────────────────────────
+data/
+**/data/
+*.mv.db
+*.trace.db
+
+# ── Logs ─────────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ── IDE / OS ─────────────────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db

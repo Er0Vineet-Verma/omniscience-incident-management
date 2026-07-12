@@ -1,0 +1,87 @@
+# ============================================================================
+# Incident Management System - local / single-host deployment
+#
+# Run from this docker/ directory:
+#
+#   docker compose up -d --build
+#
+# Services share Compose's default bridge network, so the backend reaches
+# MySQL via the hostname "mysql". MySQL data persists in the named volume
+# "ims-mysql-data".
+# ============================================================================
+
+services:
+
+  # --------------------------------------------------------------------------
+  # MySQL 8.4 database
+  # --------------------------------------------------------------------------
+  mysql:
+    image: mysql:8.4
+    container_name: ims-mysql
+    environment:
+      MYSQL_DATABASE: imsdb
+      MYSQL_USER: ims
+      MYSQL_PASSWORD: ims_password
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      - ims-mysql-data:/var/lib/mysql
+    # The backend talks to MySQL over the internal compose network; this host
+    # port mapping exists ONLY so you can inspect the DB from your machine
+    # (e.g. MySQL Workbench / mysql CLI on localhost:3306). Remove it for a
+    # locked-down deployment - nothing in this stack needs it.
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "ims", "-pims_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  # --------------------------------------------------------------------------
+  # Spring Boot backend
+  # --------------------------------------------------------------------------
+  backend:
+    build:
+      # Context is the repo root so the Dockerfile can COPY backend/...
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: ims-backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: mysql
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_NAME: imsdb
+      DB_USER: ims
+      DB_PASSWORD: ims_password
+      # Base64-encoded HMAC key (>= 64 bytes decoded), required for JWT signing.
+      # Override via a real secret in production:  JWT_SECRET=... docker compose up -d
+      JWT_SECRET: ${JWT_SECRET:-5F0o64iAwTZMxh4GrKTzcReqHbD+0q/tklcW+c2F9Bjbh1q5hY9fSvL1WhhNn27W89azjwacWuGirdvhlPw9Lg==}
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  # --------------------------------------------------------------------------
+  # React frontend - uncomment once the frontend app exists.
+  # Expects frontend/Dockerfile (e.g. node build stage + nginx serve stage).
+  # --------------------------------------------------------------------------
+  # frontend:
+  #   build:
+  #     context: ../frontend
+  #     dockerfile: Dockerfile
+  #   container_name: ims-frontend
+  #   depends_on:
+  #     - backend
+  #   environment:
+  #     # Base URL the SPA uses to call the API
+  #     VITE_API_BASE_URL: http://localhost:8080
+  #   ports:
+  #     - "3000:80"
+  #   restart: unless-stopped
+
+volumes:
+  ims-mysql-data:

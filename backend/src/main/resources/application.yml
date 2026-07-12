@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: ims-backend
+  profiles:
+    active: dev
+  jpa:
+    open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: 12MB
+      max-request-size: 12MB
+
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  jwt:
+    # No in-code default: the secret must be supplied via JWT_SECRET (.env / real env).
+    # App fails fast at startup if it is missing or shorter than 256 bits.
+    secret: ${JWT_SECRET}
+    # Current: 24h single access token (acceptable for this portfolio build).
+    # Production recommendation: 15m access token + 7-day refresh token (httpOnly cookie).
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  sla:
+    escalation-l2-minutes: 60
+    escalation-l3-minutes: 120
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+  ratelimit:
+    enabled: true
+    auth-capacity: 5            # /api/auth/**  → 5 requests
+    auth-window-minutes: 15     #               per 15 minutes per IP
+    upload-capacity: 5          # /api/logs/upload → 5 requests
+    upload-window-seconds: 60   #               per minute per IP
+    general-capacity: 60        # all other /api/** → 60 requests
+    general-window-seconds: 60  #               per minute per IP
+  security:
+    lockout:
+      max-attempts: 5           # lock an account after 5 consecutive failed logins
+      window-minutes: 15        # for this long
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/ims-backend.log

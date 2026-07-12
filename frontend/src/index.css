@@ -1,0 +1,197 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap');
+
+/*
+ * Design tokens from the Stitch "Omniscience Incident Platform" project
+ * (Mission-Critical Operations design system — see docs/design/DESIGN.md).
+ */
+@theme {
+  /* Surfaces — true-dark luminous layering */
+  --color-background: #0a0a0a;
+  --color-on-background: #e5e2e1;
+  --color-surface: #131313;
+  --color-surface-dim: #131313;
+  --color-surface-container-lowest: #0f0f0f;
+  --color-surface-container-low: #1c1b1b;
+  --color-surface-container: #201f1f;
+  --color-surface-container-high: #2a2a2a;
+  --color-surface-container-highest: #353535;
+  --color-surface-variant: #353535;
+  --color-on-surface: #e5e2e1;
+  --color-on-surface-variant: #c4c7c9;
+  --color-inverse-surface: #e5e2e1;
+
+  /* Primary = high-contrast white; accent = signal green (success/commit only) */
+  --color-primary: #ffffff;
+  --color-on-primary: #2d3133;
+  --color-primary-container: #e0e3e5;
+  --color-accent: #00ff88;
+  --color-secondary: #b7c8e1;
+  --color-info: #38bdf8;
+
+  /* Semantic */
+  --color-error: #f87171;
+  --color-error-strong: #ef4444;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+  --color-warning: #fbbf24;
+  --color-success: #22c55e;
+
+  /* Secondary containers (dashboard heatmap / chips) */
+  --color-secondary-container: #3a4a5f;
+  --color-on-secondary-container: #a9bad3;
+  --color-surface-bright: #3a3939;
+
+  /* Borders */
+  --color-outline: #8e9193;
+  --color-outline-variant: #444749;
+
+  /* Typography — Geist / Geist Mono */
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --font-body-sm: "Geist", sans-serif;
+  --font-body-md: "Geist", sans-serif;
+  --font-label-md: "Geist", sans-serif;
+  --font-headline-sm: "Geist", sans-serif;
+  --font-headline-md: "Geist", sans-serif;
+  --font-headline-lg: "Geist", sans-serif;
+  --font-mono-label: "Geist Mono", monospace;
+
+  --text-label-md: 11px;
+  --text-label-md--line-height: 1;
+  --text-label-md--letter-spacing: 0.05em;
+  --text-mono-label: 11px;
+  --text-mono-label--line-height: 1.4;
+  --text-body-sm: 13px;
+  --text-body-sm--line-height: 1.4;
+  --text-body-md: 14px;
+  --text-body-md--line-height: 1.5;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 1.5;
+  --text-headline-sm: 18px;
+  --text-headline-sm--line-height: 1.4;
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 1.3;
+  --text-headline-lg: 28px;
+  --text-headline-lg--line-height: 1.2;
+
+  /* Named spacing used throughout the Stitch exports (4px baseline) */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-base: 8px;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  font-family: var(--font-sans);
+}
+
+/* Material Symbols base (Google Fonts link supplies the font face) */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  user-select: none;
+}
+
+/* ---- Shared design-system primitives from the Stitch screens ---- */
+@utility glass-panel {
+  background: rgba(18, 18, 18, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+@utility status-pulse {
+  box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4);
+  animation: pulse-ring 2s infinite;
+}
+
+@utility shimmer {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(255, 255, 255, 0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer-slide 3s infinite;
+}
+
+@utility fade-in {
+  animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@utility scrolling-feed {
+  animation: scroll-up 20s linear infinite;
+}
+
+@utility marquee-content {
+  display: inline-block;
+  animation: marquee-slide 30s linear infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0, 255, 136, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+}
+
+@keyframes shimmer-slide {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scroll-up {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+@keyframes marquee-slide {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Respect users who prefer less motion (design-system rule + a11y) */
+@media (prefers-reduced-motion: reduce) {
+  .status-pulse, .shimmer, .scrolling-feed, .marquee-content, .fade-in {
+    animation: none;
+  }
+}
+
+/* Thin dark scrollbars to match the ops-terminal aesthetic */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #353535 transparent;
+}
+
+/* ===========================================================================
+ * Customer Portal — "Omniscience Support" (light, minimal, black accents).
+ * Scoped to .cx so the analyst dark @theme above is never affected. Customer
+ * components use explicit Tailwind values; this just sets the base + signatures.
+ * See docs/design/stitch/customer/DESIGN.md.
+ * ======================================================================== */
+.cx {
+  background-color: #f8f9fb;
+  color: #191c1e;
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  scrollbar-color: #c4c7c7 transparent;
+}
+.cx .cx-display {
+  font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+/* Signature full-black "obsidian" feature card (login hero, featured request, help CTA). */
+.cx-obsidian {
+  background: radial-gradient(circle at 50% 0%, #2e3132 0%, #191c1e 100%);
+  border: 1px solid #444748;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+/* Smooth horizontal slide for the Customer/Operations login transition. */
+.cx-slide {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cx-slide { transition: none; }
+}

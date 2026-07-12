@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:./data/imsdb;MODE=MySQL;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+# Local dev relaxes the per-IP rate limits: all browser traffic arrives through the
+# Vite dev proxy from a single IP (127.0.0.1) and the SPA polls (dashboard 30s,
+# logs 5s), so the strict prod limits in application.yml would throttle the app's
+# own legitimate use. Production (mysql profile) keeps the strict checklist values.
+app:
+  ratelimit:
+    auth-capacity: 50
+    general-capacity: 600
+    upload-capacity: 50

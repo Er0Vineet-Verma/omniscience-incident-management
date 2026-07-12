@@ -1,0 +1,66 @@
+# syntax=docker/dockerfile:1
+# ============================================================================
+# Incident Management System - Backend image
+#
+# Multi-stage build:
+#   Stage 1 (build)   : compiles and packages the Spring Boot fat jar with Maven
+#   Stage 2 (runtime) : minimal JRE image running as a non-root user
+#
+# IMPORTANT: the build context is the REPO ROOT (incident-management-system/),
+# not this docker/ directory. Build with:
+#
+#   docker build -f docker/Dockerfile.backend -t ims-backend .
+#
+# (docker-compose.yml already does this via "context: .." )
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+# Stage 1: build the jar
+# ---------------------------------------------------------------------------
+FROM maven:3.9-eclipse-temurin-21 AS build
+
+WORKDIR /workspace
+
+# Copy only the pom first so the dependency layer is cached between builds
+# as long as pom.xml does not change.
+COPY backend/pom.xml ./pom.xml
+RUN mvn -q -B dependency:go-offline
+
+# Now copy the sources and package (tests run in CI, not in the image build).
+COPY backend/src ./src
+RUN mvn -q -B package -DskipTests
+
+# ---------------------------------------------------------------------------
+# Stage 2: runtime
+# ---------------------------------------------------------------------------
+FROM eclipse-temurin:21-jre AS runtime
+
+# HEALTHCHECK note:
+# eclipse-temurin JRE images (Ubuntu-based) do NOT ship with curl, so we
+# install it explicitly in a single slim layer (--no-install-recommends +
+# apt cache cleanup keeps the size cost to a few MB). This is cleaner and
+# more deterministic than relying on wget being present, and avoids hacks
+# like spawning a second JVM just to probe the health endpoint.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    # Dedicated non-root user/group for running the app
+    && groupadd --system ims \
+    && useradd --system --gid ims --shell /usr/sbin/nologin ims
+
+WORKDIR /app
+
+# Spring Boot repackaged fat jar (ims-backend-<version>.jar). The glob matches
+# exactly one file; the .jar.original artifact does not match *.jar.
+COPY --from=build /workspace/target/*.jar /app/app.jar
+
+USER ims
+
+EXPOSE 8080
+
+# /actuator/health is public in the app's security config, so no token needed.
+# Generous start period: the app waits for MySQL, runs schema creation/seeding.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=5 \
+    CMD curl -fsS http://localhost:8080/actuator/health || exit 1
+
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
