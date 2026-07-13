@@ -1,11 +1,12 @@
 # Build output
-target/
+/target/
 
 # Local database files
-data/
+/data/
 
-# Log files (keep anything under src)
-logs/
+# Runtime log output only — anchored so source packages named "logs"
+# (e.g. src/main/java/com/ims/logs) are never excluded.
+/logs/
 *.log
 !src/**/*.log
 

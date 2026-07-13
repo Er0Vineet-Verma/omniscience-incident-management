@@ -7,24 +7,25 @@
 !**/.env.example
 
 # ── Build output ─────────────────────────────────────────────────────────
-target/
-**/target/
-dist/
-dist-ssr/
-build/
+/backend/target/
+/frontend/dist/
+/frontend/dist-ssr/
 
 # ── Dependencies ─────────────────────────────────────────────────────────
 node_modules/
 **/node_modules/
 
-# ── Local database ───────────────────────────────────────────────────────
-data/
-**/data/
+# ── Local database (runtime H2 files) ────────────────────────────────────
+/backend/data/
 *.mv.db
 *.trace.db
 
-# ── Logs ─────────────────────────────────────────────────────────────────
-logs/
+# ── Runtime logs ─────────────────────────────────────────────────────────
+# Anchored to runtime output dirs only: never exclude source folders that
+# happen to be named "logs" (e.g. backend/src/main/java/com/ims/logs).
+/logs/
+/backend/logs/
+/frontend/logs/
 *.log
 
 # ── IDE / OS ─────────────────────────────────────────────────────────────
@@ -34,3 +35,4 @@ logs/
 !.vscode/extensions.json
 .DS_Store
 Thumbs.db
+/docs/restore-point/
