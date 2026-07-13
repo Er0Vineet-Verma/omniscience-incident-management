@@ -123,11 +123,13 @@ npm run lint          # ESLint (typescript-eslint + react-hooks)
 npm run build         # strict type-check + production build
 ```
 
-### Production (Docker Compose: MySQL + backend)
+### Production (Docker Compose: SPA + backend + MySQL)
 
 ```bash
 docker compose -f docker/docker-compose.yml up -d --build
 ```
+
+App at `http://localhost:3000` (nginx serves the SPA and proxies `/api` to the backend); API at `http://localhost:8080`.
 
 See [docker/README.md](docker/README.md) for environment variables (`JWT_SECRET`, DB credentials) and details.
 

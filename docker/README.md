@@ -1,12 +1,13 @@
 # Docker deployment — Incident Management System
 
-This directory contains everything needed to run the full backend stack
-(Spring Boot API + MySQL 8.4) with Docker Compose.
+This directory contains everything needed to run the full stack
+(React SPA + Spring Boot API + MySQL 8.4) with Docker Compose.
 
-| File                 | Purpose                                                        |
-|----------------------|----------------------------------------------------------------|
-| `Dockerfile.backend` | Multi-stage build of the backend (Maven build -> slim JRE 21)  |
-| `docker-compose.yml` | MySQL + backend stack (frontend block ready, commented out)    |
+| File                    | Purpose                                                         |
+|-------------------------|-----------------------------------------------------------------|
+| `Dockerfile.backend`    | Multi-stage build of the backend (Maven build -> slim JRE 21)   |
+| `../frontend/Dockerfile`| Multi-stage build of the SPA (Vite build -> nginx, /api proxied)|
+| `docker-compose.yml`    | MySQL + backend + frontend stack                                |
 
 ## Quick start
 
@@ -16,6 +17,7 @@ From this `docker/` directory:
 docker compose up -d --build
 ```
 
+- App (SPA): <http://localhost:3000> — nginx serves the build and proxies `/api` to the backend
 - Backend API: <http://localhost:8080> (Swagger UI: <http://localhost:8080/swagger-ui.html>)
 - Health: <http://localhost:8080/actuator/health>
 - MySQL: `localhost:3306` (only because of the optional port mapping — see below)

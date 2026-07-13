@@ -66,22 +66,20 @@ services:
     restart: unless-stopped
 
   # --------------------------------------------------------------------------
-  # React frontend - uncomment once the frontend app exists.
-  # Expects frontend/Dockerfile (e.g. node build stage + nginx serve stage).
+  # React frontend - Vite build served by nginx, which also proxies /api to
+  # the backend service (the SPA uses a relative /api base, so the app is
+  # same-origin and needs no build-time API URL). Open http://localhost:3000
   # --------------------------------------------------------------------------
-  # frontend:
-  #   build:
-  #     context: ../frontend
-  #     dockerfile: Dockerfile
-  #   container_name: ims-frontend
-  #   depends_on:
-  #     - backend
-  #   environment:
-  #     # Base URL the SPA uses to call the API
-  #     VITE_API_BASE_URL: http://localhost:8080
-  #   ports:
-  #     - "3000:80"
-  #   restart: unless-stopped
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: ims-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
 
 volumes:
   ims-mysql-data:
