@@ -17,6 +17,17 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+# Observability: /actuator/health stays public (liveness probe); info and
+# metrics require an authenticated caller (see SecurityConfig PUBLIC_PATHS).
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
 app:
   jwt:
     # No in-code default: the secret must be supplied via JWT_SECRET (.env / real env).

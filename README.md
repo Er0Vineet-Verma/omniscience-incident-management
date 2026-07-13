@@ -50,6 +50,15 @@ This system centralizes the entire incident lifecycle — creation, assignment, 
 - **Help Center** — self-serve articles fed from the knowledge base (customer-facing audience only)
 - **Strict data isolation** — customers only ever see their own requests; global dashboards/reports/KB catalog are locked to Admin/Analyst
 
+## Quality & engineering practices
+
+- **Automated tests** — Spring Boot integration tests (MockMvc against the full context + in-memory H2) covering the auth flow, role boundaries (RBAC), and customer data isolation; JaCoCo coverage report generated on `mvn verify`
+- **CI on every push/PR** — backend `mvn verify` (tests + coverage), frontend `eslint` + strict `tsc` + production build, and a Docker image build gate
+- **ESLint (flat config)** — typescript-eslint + react-hooks rules across the frontend; strict TypeScript (`strict: true`, no unused locals/params)
+- **Route-level code splitting** — every page lazy-loads as its own chunk (`React.lazy` + `Suspense`); initial JS bundle ≈ 100 KB gzipped
+- **Render performance** — memoized list chips (`React.memo`) and derived-data caching (`useMemo`/`useCallback`) throughout
+- **Observability** — Spring Boot Actuator: public `/actuator/health` liveness probe; `info` + `metrics` for authenticated callers
+
 ## Security hardening
 
 - **JWT secret is environment-only** with fail-fast startup (no insecure default ever ships)
@@ -103,6 +112,17 @@ npm run dev               # http://localhost:5173 (proxies /api → :8080)
 
 Pick **Customer** or **Operations** on the login screen; you're routed to the right interface by role.
 
+### Tests
+
+```bash
+cd backend
+mvn verify            # integration tests + JaCoCo report (target/site/jacoco/index.html)
+
+cd ../frontend
+npm run lint          # ESLint (typescript-eslint + react-hooks)
+npm run build         # strict type-check + production build
+```
+
 ### Production (Docker Compose: MySQL + backend)
 
 ```bash
@@ -134,9 +154,10 @@ See [docker/README.md](docker/README.md) for environment variables (`JWT_SECRET`
 | 2 | React operations console (dashboard, incident workspace, log viewer, KB, governance, audit) | ✅ Done |
 | 3 | Security hardening (JWT env-only, rate limiting, lockout, headers, MIME validation) | ✅ Done |
 | 4 | Customer self-service portal (requests, timeline, chat + attachments, reopen/close, CSAT, Help Center) | ✅ Done |
-| 5 | Email notifications (assignment, breach, escalation) | 🔜 Planned |
-| 6 | PDF report export | 🔜 Planned |
-| 7 | Ollama AI-powered RCA + RAG knowledge base (semantic retrieval) | 🔜 Planned |
+| 5 | Production readiness: integration tests + coverage, frontend CI (lint/type-check/build), code splitting, actuator metrics | ✅ Done |
+| 6 | Email notifications (assignment, breach, escalation) | 🔜 Planned |
+| 7 | PDF report export | 🔜 Planned |
+| 8 | Ollama AI-powered RCA + RAG knowledge base (semantic retrieval) | 🔜 Planned |
 
 ## License
 

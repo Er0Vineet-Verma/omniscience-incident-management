@@ -69,7 +69,7 @@ export default function AuditCenterPage() {
       .finally(() => setLoading(false))
   }, [page])
 
-  const events = pageData?.content ?? []
+  const events = useMemo(() => pageData?.content ?? [], [pageData])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()

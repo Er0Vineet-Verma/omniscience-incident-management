@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -85,11 +86,14 @@ public class SecurityConfig {
 
     /**
      * Dev-only H2 console chain. Matched first; keeps same-origin framing (the
-     * console uses frames) and skips the strict API headers/CSP. In the mysql
-     * profile the console isn't served, so this chain simply matches nothing.
+     * console uses frames) and skips the strict API headers/CSP. Only registered
+     * when the console is actually enabled — PathRequest.toH2Console() requires
+     * the H2ConsoleProperties bean, which does not exist in profiles where the
+     * console is off (mysql, test), and would fail on every request there.
      */
     @Bean
     @Order(1)
+    @ConditionalOnProperty(name = "spring.h2.console.enabled", havingValue = "true")
     public SecurityFilterChain h2ConsoleSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher(PathRequest.toH2Console())

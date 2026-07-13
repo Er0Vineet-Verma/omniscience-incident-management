@@ -1,0 +1,23 @@
+# Test profile: in-memory H2, fixed test-only JWT secret, rate limiting off so
+# repeated MockMvc logins never trip the per-IP bucket.
+spring:
+  datasource:
+    url: jdbc:h2:mem:imstest;MODE=MySQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+app:
+  jwt:
+    # Test-only signing key (Base64, 50 bytes). Never used outside JUnit.
+    secret: dGVzdC1vbmx5LWp3dC1zZWNyZXQtZm9yLWp1bml0LWRvLW5vdC11c2UtYW55d2hlcmU=
+    expiration-ms: 3600000
+  ratelimit:
+    enabled: false
+
+logging:
+  file:
+    name: target/test-logs/ims-backend-test.log
