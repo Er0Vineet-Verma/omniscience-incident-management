@@ -133,7 +133,11 @@ App at `http://localhost:3000` (nginx serves the SPA and proxies `/api` to the b
 
 See [docker/README.md](docker/README.md) for environment variables (`JWT_SECRET`, DB credentials) and details.
 
-## Seeded Credentials
+## Seeded Credentials (dev profile only)
+
+Demo data is seeded only in the `dev` and `test` profiles — a production
+(`mysql`-profile) deployment starts with an empty user table and no demo
+accounts.
 
 | Role     | Email             | Password     | Lands on            |
 |----------|-------------------|--------------|---------------------|

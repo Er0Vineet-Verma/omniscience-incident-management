@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -32,8 +33,12 @@ import lombok.extern.slf4j.Slf4j;
  * Seeds demo data on first startup. Every block is idempotent: it only runs
  * when the corresponding table is empty, so restarting the application never
  * duplicates data.
+ *
+ * Dev and test profiles only: a production (mysql) deployment must never
+ * boot with the publicly documented demo accounts.
  */
 @Component
+@Profile({"dev", "test"})
 @RequiredArgsConstructor
 @Slf4j
 public class DataSeeder implements CommandLineRunner {

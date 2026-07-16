@@ -11,11 +11,18 @@ This directory contains everything needed to run the full stack
 
 ## Quick start
 
-From this `docker/` directory:
+From this `docker/` directory — first create your local secrets file (compose
+reads `docker/.env` automatically; it is gitignored and never committed):
 
 ```bash
+cp .env.example .env
+# edit .env: set JWT_SECRET (openssl rand -base64 64), DB_PASSWORD, DB_ROOT_PASSWORD
+
 docker compose up -d --build
 ```
+
+Compose refuses to start if any of the three secrets is missing — there are
+no baked-in fallback credentials anywhere in the stack.
 
 - App (SPA): <http://localhost:3000> — nginx serves the build and proxies `/api` to the backend
 - Backend API: <http://localhost:8080> (Swagger UI: <http://localhost:8080/swagger-ui.html>)
@@ -39,17 +46,16 @@ docker compose ps                  # container status + health
 From your host (works while the `3306:3306` mapping is present):
 
 ```bash
-mysql -h 127.0.0.1 -P 3306 -u ims -pims_password imsdb
+mysql -h 127.0.0.1 -P 3306 -u ims -p imsdb        # password = DB_PASSWORD from docker/.env
 ```
 
 Or directly inside the container (works even without the port mapping):
 
 ```bash
-docker compose exec mysql mysql -u ims -pims_password imsdb
+docker compose exec mysql mysql -u ims -p imsdb
 ```
 
-Credentials (dev defaults, defined in `docker-compose.yml`):
-database `imsdb`, user `ims` / `ims_password`, root `root_password`.
+Credentials: database `imsdb`, user `ims`, passwords from your `docker/.env`.
 
 > The `3306:3306` host port mapping exists only for convenience (DB GUI
 > tools, ad-hoc queries). The backend talks to MySQL over the internal
@@ -72,13 +78,16 @@ the `mysql` Spring profile:
 | `SPRING_PROFILES_ACTIVE`| `mysql`            | Activates the MySQL datasource   |
 | `DB_HOST` / `DB_PORT`   | `mysql` / `3306`   | MySQL host/port on the network   |
 | `DB_NAME`               | `imsdb`            | Schema name                      |
-| `DB_USER` / `DB_PASSWORD`| `ims` / `ims_password` | DB credentials              |
-| `JWT_SECRET`            | dev key in compose | Base64 HMAC key, >= 64 bytes decoded |
+| `DB_USER` / `DB_PASSWORD`| `ims` / **required** (`docker/.env`) | DB credentials    |
+| `DB_ROOT_PASSWORD`      | **required** (`docker/.env`) | MySQL root password        |
+| `JWT_SECRET`            | **required** (`docker/.env`) | Base64 HMAC key, >= 32 bytes decoded |
 
-Override the JWT secret without editing the file:
+All three secrets are mandatory — compose fails fast with a clear error if
+one is unset, instead of silently falling back to a value published in the
+repository. You can also pass them from the shell instead of `docker/.env`:
 
 ```bash
-JWT_SECRET="$(openssl rand -base64 64 | tr -d '\n')" docker compose up -d
+JWT_SECRET="$(openssl rand -base64 64 | tr -d '\n')" DB_PASSWORD=... DB_ROOT_PASSWORD=... docker compose up -d
 ```
 
 ## Healthcheck note
@@ -113,10 +122,12 @@ Azure VM are all identical from Docker's perspective:
    cd incident-management-system/docker
    ```
 
-4. **Set a real JWT secret and start the stack:**
+4. **Create the secrets file and start the stack:**
 
    ```bash
-   JWT_SECRET="$(openssl rand -base64 64 | tr -d '\n')" docker compose up -d --build
+   cp .env.example .env
+   # set JWT_SECRET (openssl rand -base64 64), DB_PASSWORD, DB_ROOT_PASSWORD
+   docker compose up -d --build
    docker compose ps        # wait until backend is "healthy"
    ```
 

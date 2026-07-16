@@ -21,8 +21,10 @@ services:
     environment:
       MYSQL_DATABASE: imsdb
       MYSQL_USER: ims
-      MYSQL_PASSWORD: ims_password
-      MYSQL_ROOT_PASSWORD: root_password
+      # No baked-in credentials: set these in docker/.env (see .env.example)
+      # or the shell environment. Compose refuses to start without them.
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in docker/.env or the environment}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Set DB_ROOT_PASSWORD in docker/.env or the environment}
     volumes:
       - ims-mysql-data:/var/lib/mysql
     # The backend talks to MySQL over the internal compose network; this host
@@ -32,7 +34,7 @@ services:
     ports:
       - "3306:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "ims", "-pims_password"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "ims", "-p${DB_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -57,10 +59,11 @@ services:
       DB_PORT: "3306"
       DB_NAME: imsdb
       DB_USER: ims
-      DB_PASSWORD: ims_password
-      # Base64-encoded HMAC key (>= 64 bytes decoded), required for JWT signing.
-      # Override via a real secret in production:  JWT_SECRET=... docker compose up -d
-      JWT_SECRET: ${JWT_SECRET:-5F0o64iAwTZMxh4GrKTzcReqHbD+0q/tklcW+c2F9Bjbh1q5hY9fSvL1WhhNn27W89azjwacWuGirdvhlPw9Lg==}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in docker/.env or the environment}
+      # Base64-encoded HMAC key (>= 32 bytes decoded), required for JWT signing.
+      # No default on purpose: a fallback key in a public repo would let anyone
+      # forge tokens. Generate one:  openssl rand -base64 64
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in docker/.env or the environment (openssl rand -base64 64)}
     ports:
       - "8080:8080"
     restart: unless-stopped
