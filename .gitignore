@@ -35,4 +35,5 @@ node_modules/
 !.vscode/extensions.json
 .DS_Store
 Thumbs.db
-/docs/restore-point/
+# Internal working documentation — never published
+/docs/

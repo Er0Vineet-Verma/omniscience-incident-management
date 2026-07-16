@@ -143,9 +143,8 @@ See [docker/README.md](docker/README.md) for environment variables (`JWT_SECRET`
 
 ## Documentation
 
-- [docs/API.md](docs/API.md) — every REST endpoint with roles, request/response examples, and the auth flow
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — module map, request flows, data model, security model, profiles
-- [docs/PROGRESS.md](docs/PROGRESS.md) — detailed build progress log
+- Swagger UI at `http://localhost:8080/swagger-ui.html` — every REST endpoint with schemas and the auth flow (log in via `/api/auth/login`, then Authorize with the returned token)
+- [docker/README.md](docker/README.md) — container deployment guide (services, env vars, secrets)
 - [database/README.md](database/README.md) — schema, FK policy, manual SQL setup
 
 ## Roadmap
